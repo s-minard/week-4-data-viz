@@ -1,6 +1,6 @@
 ---
 title: "Visualize Data"
-author: "Your Name"
+author: "Sam Minard"
 format: gfm
 ---
 
@@ -8,7 +8,8 @@ format: gfm
 ```{r}
 #| label: setup
 #| include: false
-library()
+library(tidyverse)
+library(ggplot2)
 ```
 
 
@@ -16,7 +17,6 @@ library()
 ## Your Turn 0
 
 Add a setup chunk that loads the tidyverse packages.
-
 
 ```{r}
 mpg
@@ -28,7 +28,8 @@ mpg
 Run the code on the slide to make a graph. Pay strict attention to spelling, capitalization, and parentheses!
 
 ```{r}
-
+ggplot(data = mpg) +
+  geom_point(mapping = aes(x = displ, y = hwy))
 ```
 
 
@@ -38,7 +39,10 @@ Replace this scatterplot with one that draws boxplots. Use the cheatsheet. Try y
 
 ```{r}
 ggplot(data = mpg) +
-  geom_point(mapping = aes(x = class, y = hwy))
+  geom_boxplot(mapping = aes(x = (fct_reorder(class, hwy)),
+                             y = hwy)) 
+  
+  
 ```
 
 
@@ -47,7 +51,8 @@ ggplot(data = mpg) +
 Make a histogram of the `hwy` variable from `mpg`. Hint: do not supply a y variable.
 
 ```{r}
-
+ggplot(mpg) +
+  geom_histogram(aes(x = hwy))
 ```
 
 ## Your Turn 4
@@ -55,7 +60,8 @@ Make a histogram of the `hwy` variable from `mpg`. Hint: do not supply a y varia
 Use the help page for `geom_histogram` to make the bins 2 units wide.
 
 ```{r}
-
+ggplot(mpg) +
+  geom_histogram(aes(x = hwy), binwidth = 2)
 ```
 
 
@@ -65,7 +71,12 @@ Add `color`, `size`, `alpha`, and `shape` aesthetics to your graph. Experiment.
 
 ```{r}
 ggplot(data = mpg) +
-  geom_point(mapping = aes(x = displ, y = hwy))
+  geom_point(mapping = aes(x = displ, y = hwy, color = class)) +
+  labs(x = "Engine Size Displacement",
+       y = "Highway Mileage",
+       color = "Class of Vehicle",
+       title = "The larger the engine, the lower the highway mileage") +
+  theme_light()
 ```
 
 ## Help Me
@@ -77,9 +88,16 @@ What do `facet_grid()` and `facet_wrap()` do?
 # Makes a plot that the commands below will modify
 q <- ggplot(mpg) + geom_point(aes(x = displ, y = hwy))
 
+#makes 1 row, 4 cols by cyl
 q + facet_grid(. ~ cyl)
+
+#makes 3 rows, 1 col by drv
 q + facet_grid(drv ~ .)
+
+#makes 3 rows by drv, 4 cols by cyl
 q + facet_grid(drv ~ cyl)
+
+#makes a graph for each value in class
 q + facet_wrap(~ class)
 ```
 
@@ -89,7 +107,22 @@ q + facet_wrap(~ class)
 Make a bar chart `class` colored by `class`. Use the help page for `geom_bar` to choose a "color" aesthetic for class.
 
 ```{r}
+ggplot(mpg) +
+  geom_bar(aes(x = class, 
+               fill = class)) +
+  labs(x = "Class of Vehicle",
+       y = "Number of Vehicles in Sample") +
+  guides(fill = "none")
+theme_bw()
 
+ggplot(mpg) +
+  geom_bar(aes(x = class, 
+               fill = drv),
+           position = "dodge") +
+  labs(x = "Class of Vehicle",
+       y = "Number of Vehicles in Sample",
+       fill = "Type of Drive") +
+  theme_bw()
 ```
 
 ## Quiz
@@ -97,10 +130,13 @@ Make a bar chart `class` colored by `class`. Use the help page for `geom_bar` to
 What will this code do?
 
 ```{r}
-ggplot(mpg) + 
-  geom_point(aes(displ, hwy)) +
-  geom_smooth(aes(displ, hwy)) 
-  ggsave("example.jpg")
+ggplot(mpg, aes(displ, hwy)) + 
+  geom_point(aes(color = class)) +
+  geom_smooth(color = "black", 
+              se = FALSE, 
+              method = lm) +
+  scale_color_viridis_d()
+ggsave("example.jpg", width = 6, height = 4)
 ```
 
 
